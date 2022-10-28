@@ -14,7 +14,7 @@ DATABASES = {
 print(f"DATABASES[default][NAME]={DATABASES['default']['NAME']}")
 
 INSTALLED_APPS = (
-    'cineplex_website',
+    'cineplex',
 )
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
