@@ -25,13 +25,13 @@ SECRET_KEY = os.environ['SECRET_KEY']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["127.0.0.1"]
+ALLOWED_HOSTS = [os.environ['HTTP_HOST']]
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    "cineplex_website",
+    "cineplex",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -50,7 +50,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'cineplex.urls'
+ROOT_URLCONF = 'cineplex_website.urls'
 
 TEMPLATES = [
     {
@@ -68,7 +68,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'cineplex.wsgi.application'
+WSGI_APPLICATION = 'cineplex_website.wsgi.application'
 
 
 # Database

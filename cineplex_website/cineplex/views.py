@@ -3,7 +3,7 @@ import datetime
 from django.shortcuts import render
 from django.views.generic.base import View
 
-from cineplex_website.models import DateToQuery
+from cineplex.models import DateToQuery
 
 
 # Create your views here.

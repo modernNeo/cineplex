@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from cineplex_website.models import DateToQuery, Movie, MovieAndDateIntersection, Showing
+from cineplex.models import DateToQuery, Movie, MovieAndDateIntersection, Showing
 
 
 class DateToQueryAdmin(admin.ModelAdmin):

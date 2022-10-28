@@ -16,7 +16,7 @@ from twilio.rest import Client
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
 django.setup()
 
-from cineplex_website.models import DateToQuery, Movie, Showing
+from cineplex.models import DateToQuery, Movie, Showing
 
 
 def poll_cineplex():
