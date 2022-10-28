@@ -10,11 +10,11 @@ ENV WEBSITE_DATABASE_PATH=$WEBSITE_DATABASE_PATH
 
 WORKDIR /src
 
-COPY cineplex/cineplex cineplex
-COPY cineplex/cineplex_website cineplex_website
-COPY cineplex/manage.py manage.py
-COPY cineplex/startup.sh startup.sh
-COPY cineplex/dockerized_requirements.txt requirements.txt
+COPY cineplex_website/cineplex cineplex
+COPY cineplex_website/cineplex_website cineplex_website
+COPY cineplex_website/manage.py manage.py
+COPY cineplex_website/startup.sh startup.sh
+COPY cineplex_website/dockerized_requirements.txt requirements.txt
 COPY cineplex_dockerized.env cineplex_dockerized.env
 
 

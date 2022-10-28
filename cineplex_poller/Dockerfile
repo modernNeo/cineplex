@@ -4,8 +4,8 @@ RUN setup-timezone -z Canada/Pacific
 
 ENV BOT_DATABASE_PATH=$BOT_DATABASE_PATH
 
-WORKDIR /src/cineplex_website
-COPY cineplex/cineplex_website/models.py models.py
+WORKDIR /src/cineplex
+COPY cineplex_website/cineplex/models.py models.py
 
 WORKDIR /src
 COPY cineplex_poller/settings.py settings.py
