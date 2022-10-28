@@ -26,6 +26,7 @@ SECRET_KEY = os.environ['SECRET_KEY']
 DEBUG = True
 
 ALLOWED_HOSTS = [os.environ['HTTP_HOST']]
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition

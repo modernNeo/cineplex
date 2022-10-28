@@ -20,6 +20,7 @@ from cineplex.models import DateToQuery, Movie, Showing
 
 
 def poll_cineplex():
+    date = datetime.datetime.now().strftime("%Y/%m/%d - %-H:%M:%S")
     location_id = 1412
     headers = {
         "Ocp-Apim-Subscription-Key": os.environ['CINEPLEX_SUBSCRIPTION_KEY']
@@ -29,6 +30,7 @@ def poll_cineplex():
         showing.id: showing
         for showing in Showing.objects.all().filter(date__gte=datetime.datetime.now())
     }
+    print(f"{date}-starting poll")
     new_shows_with_cc = []
     for date_to_query in DateToQuery.objects.all():
         if datetime.datetime.now().date() <= date_to_query.date:
@@ -94,6 +96,7 @@ def poll_cineplex():
     if len(new_shows_with_cc) > 0:
         new_shows_with_cc = "<br>\n".join(new_shows_with_cc)
         send_alerts(new_shows_with_cc)
+    print(f"{date}-polling done")
 
 
 def send_alerts(showings: str):
@@ -148,5 +151,5 @@ def send_sms():
 if __name__ == '__main__':
     scheduler = BlockingScheduler()
     poll_cineplex()
-    scheduler.add_job(func=poll_cineplex, hours=1, trigger='interval')
+    scheduler.add_job(func=poll_cineplex, hour=17, trigger='cron')
     scheduler.start()
