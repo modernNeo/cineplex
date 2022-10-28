@@ -1,0 +1,33 @@
+version: "3.8"
+services:
+  cineplex_website:
+    env_file: cineplex_dockerized.env
+    build:
+      context: .
+      dockerfile:  cineplex_website/Dockerfile
+    volumes:
+      - ./sqlite_db:/src/sqlite_db
+    container_name: cineplex_website
+    networks:
+      - cineplex_network
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    ports:
+      - "8000:8000"
+  cineplex_poller:
+    env_file: cineplex_dockerized.env
+    build:
+      context: .
+      dockerfile:  cineplex_poller/Dockerfile
+    volumes:
+      - ./sqlite_db:/src/sqlite_db
+    container_name: cineplex_poller
+    networks:
+      - cineplex_network
+    restart: unless-stopped
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+
+networks:
+  cineplex_network:
+    external: true
