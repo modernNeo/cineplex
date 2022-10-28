@@ -70,7 +70,7 @@ class Command(BaseCommand):
                                 showing.cc_enabled = showing_types['isCcEnabled']
                                 showing.ds_enabled = showing_types['isDsEnabled']
                                 if showing_types['isCcEnabled'] or showing_types['isDsEnabled']:
-                                    new_shows_with_cc.append(showing)
+                                    new_shows_with_cc.append(f"{showing}")
                                 showing.save()
                             else:
                                 if not existing_shows[showing.id].visible:
@@ -85,12 +85,12 @@ class Command(BaseCommand):
                                         (showing_types['isDsEnabled'] and showing_types[
                                             'isDsEnabled'] != showing.ds_enabled)
                                 ):
-                                    new_shows_with_cc.append(showing)
+                                    new_shows_with_cc.append(f"{showing}")
                                 showing.save()
         for existing_show in existing_shows.values():
             existing_show._visible = False
             existing_show.save()
-        new_shows_with_cc = "\n".join(new_shows_with_cc)
+        new_shows_with_cc = "<br>\n".join(new_shows_with_cc)
         send_alerts(new_shows_with_cc)
 
 
@@ -98,22 +98,6 @@ def send_alerts(showings: str):
     send_email(showings)
     send_sms()
     print(f"all enabled alerts sent to me")
-
-
-def send_sms(movie_name: str = None, movie_link: str = None):
-    # https://www.fullstackpython.com/blog/send-sms-text-messages-python.html
-    body = f"{movie_name} is now available: {movie_link}"
-    # the following line needs your Twilio Account SID and Auth Token
-    client = Client(f"{os.environ['TWILIO_ACCOUNT_SID']}", f"{os.environ['TWILIO_AUTH_TOKEN']}")
-
-    # change the "from_" number to your Twilio number and the "to" number
-    # to the phone number you signed up for Twilio with, or upgrade your
-    # account to send SMS to any phone number
-    client.messages.create(to=f"{os.environ['PHONE_NUMBER']}",
-                           from_=f"{os.environ['TWILIO_VIRTUAL_NUMBER']}",
-                           body=body)
-    print(f"text sent to {os.environ['PHONE_NUMBER']} for new CC movies")
-
 
 def send_email(showings: str = None):
     from_person_name = 'Cineplex-CC-Showings'
@@ -141,3 +125,20 @@ def send_email(showings: str = None):
     server.send_message(from_addr=from_person_email, to_addrs=to_person_email, msg=msg)
     server.close()
     print(f"email sent to {os.environ['TO_EMAIL']} for new CC movies")
+
+
+def send_sms():
+    # https://www.fullstackpython.com/blog/send-sms-text-messages-python.html
+    body = f"More tickets available in CC for movies"
+    # the following line needs your Twilio Account SID and Auth Token
+    client = Client(f"{os.environ['TWILIO_ACCOUNT_SID']}", f"{os.environ['TWILIO_AUTH_TOKEN']}")
+
+    # change the "from_" number to your Twilio number and the "to" number
+    # to the phone number you signed up for Twilio with, or upgrade your
+    # account to send SMS to any phone number
+    client.messages.create(to=f"{os.environ['PHONE_NUMBER']}",
+                           from_=f"{os.environ['TWILIO_VIRTUAL_NUMBER']}",
+                           body=body)
+    print(f"text sent to {os.environ['PHONE_NUMBER']} for new CC movies")
+
+

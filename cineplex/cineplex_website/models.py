@@ -51,7 +51,7 @@ class Showing(models.Model):
     def save(self, *args, **kwargs):
         date = datetime.datetime.now().strftime("%Y/%m/%d - %-H:%M:%S")
         if self.id is None:
-            print("new showing being saved")
+            print(f"{date}-new showing being saved")
             self.audit_log = f"{date}-showing added\n"
         if getattr(self, "_seatsRemaining", None) is not None and self._seatsRemaining != self.seatsRemaining:
             self.audit_log += (
