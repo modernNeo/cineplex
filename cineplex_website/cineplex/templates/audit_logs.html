@@ -1,0 +1,12 @@
+<html>
+    <body>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <p><a href="/">Home Page</a> | Audit Logs Page | <a href="?poll_site=true">Poll Cineplex Website</a></p>
+        {%  if message is not None %}
+            <p>{{ message }}</p>
+        {% endif %}
+        {%  for showing in showings %}
+            <p>{{ showing.get_latest_update_date }} - {{ showing }}<br>{{ showing.get_latest_update }}</p>
+        {% endfor %}
+    </body>
+</html>

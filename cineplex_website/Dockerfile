@@ -16,7 +16,7 @@ COPY cineplex_website/manage.py manage.py
 COPY cineplex_website/startup.sh startup.sh
 COPY cineplex_website/dockerized_requirements.txt requirements.txt
 COPY cineplex_dockerized.env cineplex_dockerized.env
-
+COPY ../poll_cineplex poll_cineplex
 
 CMD ["./startup.sh"]
 

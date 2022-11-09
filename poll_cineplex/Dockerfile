@@ -8,10 +8,10 @@ WORKDIR /src/cineplex
 COPY cineplex_website/cineplex/models.py models.py
 
 WORKDIR /src
-COPY cineplex_poller/settings.py settings.py
-COPY cineplex_poller/dockerized_requirements.txt requirements.txt
+COPY poll_cineplex/settings.py settings.py
+COPY poll_cineplex/dockerized_requirements.txt requirements.txt
 COPY cineplex_dockerized.env cineplex_dockerized.env
-COPY cineplex_poller/cineplex_poller.py cineplex_poller.py
+COPY poll_cineplex/poll_cineplex.py poll_cineplex.py
 
 RUN apk update && apk add gcc
 
@@ -19,7 +19,7 @@ RUN apk update && apk add musl-dev
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-CMD ["python", "cineplex_poller.py"]
+CMD ["python", "poll_cineplex.py"]
 
 #CMD ["sh"]
 

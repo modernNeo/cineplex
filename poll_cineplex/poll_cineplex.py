@@ -33,8 +33,10 @@ def poll_cineplex():
     print(f"{date}-starting poll")
     new_shows_with_cc = []
     for date_to_query in DateToQuery.objects.all():
+        print(f"parsing {date_to_query.date}")
         if datetime.datetime.now().date() <= date_to_query.date:
             for movie_and_date_intersection in date_to_query.movieanddateintersection_set.all():
+                print(f"parsing {movie_and_date_intersection.movie.name}")
                 film_id = movie_and_date_intersection.movie.filmId
                 response = requests.request(
                     "GET",
@@ -47,31 +49,38 @@ def poll_cineplex():
                 for showing_types in (json.loads(response.text))[0]['dates'][0]['movies'][0]['experiences']:
                     movie = Movie.objects.get_or_create(filmId=film_id)[0]
                     for session in showing_types['sessions']:
+                        exp_types = " ".join(showing_types['experienceTypes'])
+                        print(f"{exp_types}-{session['showStartDateTime']}")
                         showtime_date_and_time = datetime.datetime.strptime(
                             session['showStartDateTime'],
                             "%Y-%m-%dT%H:%M:%S"
                         )
                         last_row = None
-                        seating = BeautifulSoup(
-                            urlopen(session['seatMapUrl']).read(),
-                            features="html.parser"
-                        )
-                        for script in seating(["script"]):
-                            if "SeatMapData" in script.next:
-                                x = json.loads(re.search('({.+})', script.next).group(0).replace("'", '"'))
-                                rows = x['SeatMapData']['Rows']
-                                last_row = rows[len(rows) - 1]['RowLabel']
+                        if session.get('isSoldOut', None) is not None and not session['isSoldOut']:
+                            try:
+                                seating = BeautifulSoup(
+                                    urlopen(session['seatMapUrl']).read(),
+                                    features="html.parser"
+                                )
+                                for script in seating(["script"]):
+                                    if "SeatMapData" in script.next:
+                                        x = json.loads(re.search('({.+})', script.next).group(0).replace("'", '"'))
+                                        rows = x['SeatMapData']['Rows']
+                                        last_row = rows[len(rows) - 1]['RowLabel']
+                            except Exception as e:
+                                print(e)
                         showing, new = Showing.objects.get_or_create(
                             movie=movie, date=showtime_date_and_time.date(), time=showtime_date_and_time.time(),
                             showing_type=" ".join(showing_types['experienceTypes']),
                             auditorium=session['auditorium'],
-                            seatMapUrl=session['seatMapUrl'], last_row=last_row,
+                            seatMapUrl=session['seatMapUrl'],
                             payment_url=session['ticketingUrl']
                         )
                         if new:
                             showing.seatsRemaining = session['seatsRemaining']
                             showing.cc_enabled = showing_types['isCcEnabled']
                             showing.ds_enabled = showing_types['isDsEnabled']
+                            showing.last_row = last_row
                             if showing_types['isCcEnabled'] or showing_types['isDsEnabled']:
                                 new_shows_with_cc.append(f"{showing}")
                             showing.save()
@@ -82,6 +91,7 @@ def poll_cineplex():
                             showing._seatsRemaining = session['seatsRemaining']
                             showing._cc_enabled = showing_types['isCcEnabled']
                             showing._ds_enabled = showing_types['isDsEnabled']
+                            showing._last_row = last_row
                             if (
                                 (showing_types['isCcEnabled'] and showing_types[
                                     'isCcEnabled'] != showing.cc_enabled) or

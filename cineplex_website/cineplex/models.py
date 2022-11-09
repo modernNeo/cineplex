@@ -29,6 +29,11 @@ class MovieAndDateIntersection(models.Model):
     date = models.ForeignKey(DateToQuery, on_delete=models.CASCADE)
 
 
+date_format = "%Y/%m/%d"
+date_str_strftime_format = f"{date_format} - %-H:%M:%S"
+date_str_strptime_format = f"{date_format} - %H:%M:%S"
+
+
 class Showing(models.Model):
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
     date = models.DateField()
@@ -41,43 +46,65 @@ class Showing(models.Model):
     seatMapUrl = models.TextField()
     audit_log = models.TextField()
     visible = models.BooleanField(default=True)
-    last_row = models.TextField()
+    last_row = models.TextField(null=True)
     payment_url = models.TextField()
 
     @property
     def get_date(self):
-        return self.date.strftime("%Y/%m/%d")
+        return self.date.strftime(date_format)
 
     def save(self, *args, **kwargs):
-        date = datetime.datetime.now().strftime("%Y/%m/%d - %-H:%M:%S")
+        date = datetime.datetime.now().strftime(date_str_strftime_format)
         if self.id is None:
             print(f"{date}-new showing being saved")
             self.audit_log = f"{date}-showing added\n"
-        if getattr(self, "_seatsRemaining", None) is not None and self._seatsRemaining != self.seatsRemaining:
+        if getattr(self, "_seatsRemaining", self.seatsRemaining) != self.seatsRemaining:
             self.audit_log += (
                 f"{date}-changing seats remaining from {self.seatsRemaining} to {self._seatsRemaining}\n"
             )
             self.seatsRemaining = self._seatsRemaining
             print(f"{self.id}-existing showing being updated")
-        if getattr(self, "_cc_enabled", None) is not None and self._cc_enabled != self.cc_enabled:
+        if getattr(self, "_cc_enabled", self.cc_enabled) != self.cc_enabled:
             self.audit_log += (
                 f"{date}-changing seats remaining from {self.cc_enabled} to {self._cc_enabled}\n"
             )
             self.cc_enabled = self._cc_enabled
             print(f"{self.id}-existing showing being updated")
-        if getattr(self, "_ds_enabled", None) is not None and self._ds_enabled != self.ds_enabled:
+        if getattr(self, "_ds_enabled", self.ds_enabled) != self.ds_enabled:
             self.audit_log += (
                 f"{date}-changing seats remaining from {self.ds_enabled} to {self._ds_enabled}\n"
             )
             self.ds_enabled = self._ds_enabled
             print(f"{self.id}-existing showing being updated")
-        if getattr(self, "_visible", None) is not None and self._visible != self.visible:
+        if getattr(self, "_visible", self.visible) != self.visible:
             self.audit_log += (
                 f"{date}-changing seats remaining from {self.visible} to {self._visible}\n"
             )
             self.visible = self._visible
             print(f"{self.id}-existing showing being updated")
+        if getattr(self, "_last_row", self.last_row) != self.last_row:
+            self.audit_log += (
+                f"{date}-changing last row from {self.last_row} to {self._last_row}\n"
+            )
+            self.last_row = self._last_row
+            print(f"{self.id}-existing showing being updated")
         super(Showing, self).save(*args, **kwargs)
+
+    @property
+    def get_latest_update_date(self):
+        audit_logs = [audit_log for audit_log in self.audit_log.split("\n") if len(audit_log) > 0]
+        last_audit_log = audit_logs[len(audit_logs) - 1]
+        date_str = ""
+        if last_audit_log.find("-changing") != -1:
+            date_str = last_audit_log[:last_audit_log.find("-changing")]
+        elif last_audit_log.find("-showing") != -1:
+            date_str = last_audit_log[:last_audit_log.find("-showing")]
+        return datetime.datetime.strptime(date_str, date_str_strptime_format)
+
+    @property
+    def get_latest_update(self):
+        audit_logs = [audit_log for audit_log in self.audit_log.split("\n") if len(audit_log) > 0]
+        return audit_logs[len(audit_logs) - 1]
 
     def __str__(self):
         return f"Movie: {self.movie} - Time: {self.date} {self.time.strftime('%I:%M %p')} - CC: {self.cc_enabled} - Showing Type:  {self.showing_type} | {self.auditorium} | Last Row: {self.last_row}"
