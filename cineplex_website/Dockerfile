@@ -6,17 +6,15 @@ ENV SECRET_KEY=$SECRET_KEY
 ENV HTTP_HOST=$HTTP_HOST
 ENV WEBSITE_DATABASE_PATH=$WEBSITE_DATABASE_PATH
 
-#EXPOSE 8000
-
 WORKDIR /src
 
 COPY cineplex_website/cineplex cineplex
 COPY cineplex_website/cineplex_website cineplex_website
+COPY poll_cineplex poll_cineplex
 COPY cineplex_website/manage.py manage.py
 COPY cineplex_website/startup.sh startup.sh
 COPY cineplex_website/dockerized_requirements.txt requirements.txt
 COPY cineplex_dockerized.env cineplex_dockerized.env
-COPY ../poll_cineplex poll_cineplex
 
 CMD ["./startup.sh"]
 

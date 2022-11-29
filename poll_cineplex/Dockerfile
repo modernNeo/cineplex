@@ -22,6 +22,3 @@ RUN pip install --no-cache-dir -r requirements.txt
 CMD ["python", "poll_cineplex.py"]
 
 #CMD ["sh"]
-
-#BASE_DIR=/
-#DATABASES[default][NAME]=/sqlite_db/db.sqlite3
