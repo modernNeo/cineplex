@@ -8,6 +8,7 @@ services:
     volumes:
       - ./sqlite_db:/src/sqlite_db
     container_name: cineplex_website
+    image: cineplex_website
     networks:
       - cineplex_network
     stdin_open: true # docker run -i
@@ -20,6 +21,7 @@ services:
     volumes:
       - ./sqlite_db:/src/sqlite_db
     container_name: poll_cineplex
+    image: poll_cineplex
     networks:
       - cineplex_network
     restart: unless-stopped
