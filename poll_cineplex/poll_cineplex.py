@@ -70,13 +70,15 @@ def poll_cineplex():
                             except Exception as e:
                                 print(e)
                         showing, new = Showing.objects.get_or_create(
-                            movie=movie, date=showtime_date_and_time.date(), time=showtime_date_and_time.time(),
-                            showing_type=" ".join(showing_types['experienceTypes']),
-                            auditorium=session['auditorium'],
-                            seatMapUrl=session['seatMapUrl'],
                             payment_url=session['ticketingUrl']
                         )
                         if new:
+                            showing.movie = movie
+                            showing.date = showtime_date_and_time.date()
+                            showing.time = showtime_date_and_time.time()
+                            showing.showing_type = " ".join(showing_types['experienceTypes'])
+                            showing.auditorium = session['auditorium']
+                            showing.seatMapUrl = session['seatMapUrl']
                             showing.seatsRemaining = session['seatsRemaining']
                             showing.cc_enabled = showing_types['isCcEnabled']
                             showing.ds_enabled = showing_types['isDsEnabled']
