@@ -1,7 +1,7 @@
 version: "3.8"
 services:
   cineplex_website:
-    env_file: ../cineplex_dockerized.env
+#    env_file: ../cineplex_dockerized.env
     build:
       context: ../
       dockerfile:  cineplex_website/Dockerfile
@@ -22,7 +22,7 @@ services:
 #    stdin_open: true # docker run -i
 #    tty: true        # docker run -t
   cineplex_poller:
-    env_file: ../cineplex_dockerized.env
+#    env_file: ../cineplex_dockerized.env
     build:
       context: ../
       dockerfile:  cineplex_poller/Dockerfile
