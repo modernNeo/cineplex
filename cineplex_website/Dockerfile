@@ -18,6 +18,8 @@ COPY cineplex_website/dockerized_requirements.txt requirements.txt
 COPY cineplex_dockerized.env cineplex_dockerized.env
 COPY CI/wait-for-postgres.sh wait-for-postgres.sh
 
+RUN apk add postgresql
+
 CMD ["./wait-for-postgres.sh", "./startup.sh"]
 
 #CMD ["sh"]
