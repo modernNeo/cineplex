@@ -3,3 +3,4 @@ beautifulsoup4==4.11.1
 twilio==7.15.0
 Django==4.1.2
 APScheduler==3.9.1
+psycopg2-binary

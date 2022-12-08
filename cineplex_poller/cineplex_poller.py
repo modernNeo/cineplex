@@ -16,10 +16,10 @@ from twilio.rest import Client
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
 django.setup()
 
-from cineplex.models import DateToQuery, Movie, Showing
+from cineplex.models import DateToQuery, Movie, Showing, AuditLog
 
 
-def poll_cineplex():
+def cineplex_poller():
     date = datetime.datetime.now().strftime("%Y/%m/%d - %-H:%M:%S")
     location_id = 1412
     headers = {
@@ -164,6 +164,6 @@ def send_sms():
 
 if __name__ == '__main__':
     scheduler = BlockingScheduler()
-    poll_cineplex()
-    scheduler.add_job(func=poll_cineplex, hour=17, trigger='cron')
+    cineplex_poller()
+    scheduler.add_job(func=cineplex_poller, hour=17, trigger='cron')
     scheduler.start()

@@ -44,7 +44,6 @@ class Showing(models.Model):
     auditorium = models.TextField()
     seatsRemaining = models.IntegerField(default=0)
     seatMapUrl = models.TextField()
-    audit_log = models.TextField()
     visible = models.BooleanField(default=True)
     last_row = models.TextField(null=True)
     payment_url = models.TextField()
@@ -57,54 +56,59 @@ class Showing(models.Model):
         date = datetime.datetime.now().strftime(date_str_strftime_format)
         if self.id is None:
             print(f"{date}-new showing being saved")
-            self.audit_log = f"{date}-showing added\n"
+            audit_log = f"{date}-showing added\n"
+            AuditLog(time_audited=date, audit_log=audit_log, showing=self).save()
         if getattr(self, "_seatsRemaining", self.seatsRemaining) != self.seatsRemaining:
-            self.audit_log += (
+            audit_log = (
                 f"{date}-changing seats remaining from {self.seatsRemaining} to {self._seatsRemaining}\n"
             )
+            AuditLog(time_audited=date, audit_log=audit_log, showing=self).save()
             self.seatsRemaining = self._seatsRemaining
             print(f"{self.id}-existing showing being updated")
         if getattr(self, "_cc_enabled", self.cc_enabled) != self.cc_enabled:
-            self.audit_log += (
+            audit_log = (
                 f"{date}-changing seats remaining from {self.cc_enabled} to {self._cc_enabled}\n"
             )
+            AuditLog(time_audited=date, audit_log=audit_log, showing=self).save()
             self.cc_enabled = self._cc_enabled
             print(f"{self.id}-existing showing being updated")
+
         if getattr(self, "_ds_enabled", self.ds_enabled) != self.ds_enabled:
-            self.audit_log += (
+            audit_log = (
                 f"{date}-changing seats remaining from {self.ds_enabled} to {self._ds_enabled}\n"
             )
+            AuditLog(time_audited=date, audit_log=audit_log, showing=self).save()
             self.ds_enabled = self._ds_enabled
             print(f"{self.id}-existing showing being updated")
         if getattr(self, "_visible", self.visible) != self.visible:
-            self.audit_log += (
+            audit_log = (
                 f"{date}-changing seats remaining from {self.visible} to {self._visible}\n"
             )
+            AuditLog(time_audited=date, audit_log=audit_log, showing=self).save()
             self.visible = self._visible
             print(f"{self.id}-existing showing being updated")
         if getattr(self, "_last_row", self.last_row) != self.last_row:
-            self.audit_log += (
+            audit_log = (
                 f"{date}-changing last row from {self.last_row} to {self._last_row}\n"
             )
+            AuditLog(time_audited=date, audit_log=audit_log, showing=self).save()
             self.last_row = self._last_row
             print(f"{self.id}-existing showing being updated")
         super(Showing, self).save(*args, **kwargs)
 
     @property
     def get_latest_update_date(self):
-        audit_logs = [audit_log for audit_log in self.audit_log.split("\n") if len(audit_log) > 0]
-        last_audit_log = audit_logs[len(audit_logs) - 1]
-        date_str = ""
-        if last_audit_log.find("-changing") != -1:
-            date_str = last_audit_log[:last_audit_log.find("-changing")]
-        elif last_audit_log.find("-showing") != -1:
-            date_str = last_audit_log[:last_audit_log.find("-showing")]
-        return datetime.datetime.strptime(date_str, date_str_strptime_format)
+        return self.auditlog_set.all().order_by('-time_audited')[0].time_audited
 
     @property
     def get_latest_update(self):
-        audit_logs = [audit_log for audit_log in self.audit_log.split("\n") if len(audit_log) > 0]
-        return audit_logs[len(audit_logs) - 1]
+        return self.auditlog_set.all().order_by('-time_audited')
 
     def __str__(self):
         return f"Movie: {self.movie} - Time: {self.date} {self.time.strftime('%I:%M %p')} - CC: {self.cc_enabled} - Showing Type:  {self.showing_type} | {self.auditorium} | Last Row: {self.last_row}"
+
+
+class AuditLog(models.Model):
+    time_audited = models.DateTimeField()
+    audit_log = models.TextField()
+    showing = models.ForeignKey(Showing, on_delete=models.CASCADE)

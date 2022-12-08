@@ -1,0 +1,56 @@
+version: "3.8"
+services:
+  cineplex_website:
+    env_file: ../cineplex_dockerized.env
+    build:
+      context: ../
+      dockerfile:  cineplex_website/Dockerfile
+    environment:
+        - POSTGRES_DB
+        - POSTGRES_USER
+        - POSTGRES_PASSWORD
+        - COMPOSE_PROJECT_NAME
+    ports:
+        - 8000:8000
+    depends_on:   # used to ensure that docker wont start finance_site until after it has started the database container
+        - "db"
+    container_name: "${COMPOSE_PROJECT_NAME}_website"
+    image: "${COMPOSE_PROJECT_NAME}_website"
+    networks:
+      - cineplex_network
+    restart: unless-stopped
+#    stdin_open: true # docker run -i
+#    tty: true        # docker run -t
+  cineplex_poller:
+    env_file: ../cineplex_dockerized.env
+    build:
+      context: ../
+      dockerfile:  cineplex_poller/Dockerfile
+    container_name: "${COMPOSE_PROJECT_NAME}_poller"
+    image: "${COMPOSE_PROJECT_NAME}_poller"
+    networks:
+      - cineplex_network
+    restart: unless-stopped
+    environment:
+        - POSTGRES_DB
+        - POSTGRES_USER
+        - POSTGRES_PASSWORD
+        - COMPOSE_PROJECT_NAME
+    depends_on:   # used to ensure that docker wont start finance_site until after it has started the database container
+        - "db"
+#    stdin_open: true # docker run -i
+#    tty: true        # docker run -t
+  db: #declaration of the postgres container
+      environment:
+          - POSTGRES_DB
+          - POSTGRES_USER
+          - POSTGRES_PASSWORD
+      image: postgres:alpine #using postgres image
+      container_name: "${COMPOSE_PROJECT_NAME}_db"
+      networks:
+          - cineplex_network
+
+networks:
+  cineplex_network:
+        name: cineplex_network
+        external: true

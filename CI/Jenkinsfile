@@ -1,0 +1,38 @@
+pipeline {
+    agent any
+    options {
+        disableConcurrentBuilds()
+        buildDiscarder(logRotator(numToKeepStr: '10', artifactNumToKeepStr: '10'))
+    }
+    stages {
+        stage('Deploy') {
+            when {
+                branch 'master'
+            }
+            steps {
+                withCredentials(
+                [string(credentialsId: 'CINEPLEX_POSTGRES_PASSWORD', variable: 'CINEPLEX_POSTGRES_PASSWORD'),
+                string(credentialsId: 'CINEPLEX_POSTGRES_USER', variable: 'CINEPLEX_POSTGRES_USER'),
+                string(credentialsId: 'CINEPLEX_POSTGRES_DB', variable: 'CINEPLEX_POSTGRES_DB')]
+                ){
+                    sh label: '', script: """bash -c \'
+                        export POSTGRES_DB="'"${CINEPLEX_POSTGRES_DB}"'";
+                        export POSTGRES_USER="'"${CINEPLEX_POSTGRES_USER}"'";
+                        export POSTGRES_PASSWORD="'"${CINEPLEX_POSTGRES_PASSWORD}"'";
+                        export JENKINS="true";
+                        ./CI/deploy.sh;
+                    \'"""
+                }
+            }
+        }
+    }
+    post {
+      always {
+          script {
+              if (fileExists('test_results/all-unit-tests.xml')){
+                  junit skipPublishingChecks: true, testResults: 'test_results/all-unit-tests.xml'
+              }
+          }
+      }
+  }
+}
