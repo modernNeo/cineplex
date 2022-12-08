@@ -18,6 +18,9 @@ docker rm -f ${prod_website_container_name} || true
 docker rm -f ${prod_poller_container_name} || true
 docker image rm -f $(docker images  | grep -i "${prod_website_image_name_lower_case}" | awk '{print $3}') || true
 docker image rm -f $(docker images  | grep -i "${prod_poller_image_name_lower_case}" | awk '{print $3}') || true
+
+echo "" > cineplex_dockerized.env
+
 if [ "${JENKINS}" == "true" ]; then
   docker-compose -f "${docker_compose_file}" up -d
 else
