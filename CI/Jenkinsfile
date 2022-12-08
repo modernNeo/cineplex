@@ -13,12 +13,14 @@ pipeline {
                 withCredentials(
                 [string(credentialsId: 'CINEPLEX_POSTGRES_PASSWORD', variable: 'CINEPLEX_POSTGRES_PASSWORD'),
                 string(credentialsId: 'CINEPLEX_POSTGRES_USER', variable: 'CINEPLEX_POSTGRES_USER'),
-                string(credentialsId: 'CINEPLEX_POSTGRES_DB', variable: 'CINEPLEX_POSTGRES_DB')]
+                string(credentialsId: 'CINEPLEX_POSTGRES_DB', variable: 'CINEPLEX_POSTGRES_DB'),
+                string(credentialsId: 'CINEPLEX_SECRET_KEY', variable: 'CINEPLEX_SECRET_KEY')]
                 ){
                     sh label: '', script: """bash -c \'
                         export POSTGRES_DB="'"${CINEPLEX_POSTGRES_DB}"'";
                         export POSTGRES_USER="'"${CINEPLEX_POSTGRES_USER}"'";
                         export POSTGRES_PASSWORD="'"${CINEPLEX_POSTGRES_PASSWORD}"'";
+                        export CINEPLEX_SECRET_KEY="'"${CINEPLEX_SECRET_KEY}"'";
                         export JENKINS="true";
                         ./CI/deploy.sh;
                     \'"""
