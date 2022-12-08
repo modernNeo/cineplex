@@ -9,8 +9,11 @@ WORKDIR /src/app
 COPY cineplex_website/cineplex cineplex
 
 # this is here cause the user has the option of manually running a poll via the website
-COPY cineplex_poller cineplex_poller
+WORKDIR /src/app/cineplex_poller
+COPY cineplex_poller/cineplex_poller.py cineplex_poller.py
+COPY cineplex_poller/dockerized_requirements.txt requirements.txt
 
+WORKDIR /src/app
 COPY cineplex_website/cineplex_website cineplex_website
 COPY cineplex_website/manage.py manage.py
 COPY cineplex_website/startup.sh startup.sh
