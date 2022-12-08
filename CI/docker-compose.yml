@@ -11,6 +11,7 @@ services:
         - POSTGRES_PASSWORD
         - COMPOSE_PROJECT_NAME
         - SECRET_KEY
+        - HTTP_HOST
     ports:
         - 8001:8000
     depends_on:   # used to ensure that docker wont start finance_site until after it has started the database container
