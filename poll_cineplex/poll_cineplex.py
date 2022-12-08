@@ -32,6 +32,7 @@ def poll_cineplex():
     }
     print(f"{date}-starting poll")
     new_shows_with_cc = []
+    current_time = datetime.datetime.now()
     for date_to_query in DateToQuery.objects.all():
         print(f"parsing {date_to_query.date}")
         if datetime.datetime.now().date() <= date_to_query.date:
@@ -87,21 +88,22 @@ def poll_cineplex():
                                 new_shows_with_cc.append(f"{showing}")
                             showing.save()
                         else:
-                            if not existing_shows[showing.id].visible:
-                                showing._visible = True
-                            del existing_shows[showing.id]
-                            showing._seatsRemaining = session['seatsRemaining']
-                            showing._cc_enabled = showing_types['isCcEnabled']
-                            showing._ds_enabled = showing_types['isDsEnabled']
-                            showing._last_row = last_row
-                            if (
-                                (showing_types['isCcEnabled'] and showing_types[
-                                    'isCcEnabled'] != showing.cc_enabled) or
-                                (showing_types['isDsEnabled'] and showing_types[
-                                    'isDsEnabled'] != showing.ds_enabled)
-                            ):
-                                new_shows_with_cc.append(f"{showing}")
-                            showing.save()
+                            if current_time <= showtime_date_and_time:
+                                if not existing_shows[showing.id].visible:
+                                    showing._visible = True
+                                del existing_shows[showing.id]
+                                showing._seatsRemaining = session['seatsRemaining']
+                                showing._cc_enabled = showing_types['isCcEnabled']
+                                showing._ds_enabled = showing_types['isDsEnabled']
+                                showing._last_row = last_row
+                                if (
+                                    (showing_types['isCcEnabled'] and showing_types[
+                                        'isCcEnabled'] != showing.cc_enabled) or
+                                    (showing_types['isDsEnabled'] and showing_types[
+                                        'isDsEnabled'] != showing.ds_enabled)
+                                ):
+                                    new_shows_with_cc.append(f"{showing}")
+                                showing.save()
     for existing_show in existing_shows.values():
         existing_show._visible = False
         existing_show.save()
