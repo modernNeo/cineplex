@@ -18,7 +18,7 @@ COPY cineplex_website/cineplex_website cineplex_website
 COPY cineplex_website/manage.py manage.py
 COPY cineplex_website/startup.sh startup.sh
 COPY cineplex_website/dockerized_requirements.txt requirements.txt
-COPY cineplex_dockerized.env cineplex_dockerized.env
+# COPY cineplex_dockerized.env cineplex_dockerized.env
 COPY CI/wait-for-postgres.sh wait-for-postgres.sh
 
 RUN apk add postgresql
