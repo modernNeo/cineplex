@@ -27,7 +27,7 @@ SECRET_KEY = os.environ['SECRET_KEY']
 DEBUG = True
 
 ALLOWED_HOSTS = [os.environ['HTTP_HOST']]
-CSRF_TRUSTED_ORIGINS = [os.environ['HTTP_HOST']]
+CSRF_TRUSTED_ORIGINS = [f"https://{os.environ['HTTP_HOST']}"]
 
 # Application definition
 
