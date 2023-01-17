@@ -12,6 +12,7 @@ services:
         - COMPOSE_PROJECT_NAME
         - SECRET_KEY
         - HTTP_HOST
+        - CINEPLEX_SUBSCRIPTION_KEY
     depends_on:   # used to ensure that docker wont start finance_site until after it has started the database container
         - "db"
     container_name: "${COMPOSE_PROJECT_NAME}_website"
@@ -36,6 +37,7 @@ services:
         - POSTGRES_USER
         - POSTGRES_PASSWORD
         - COMPOSE_PROJECT_NAME
+        - CINEPLEX_SUBSCRIPTION_KEY
     depends_on:   # used to ensure that docker wont start finance_site until after it has started the database container
         - "db"
 #    stdin_open: true # docker run -i
