@@ -70,10 +70,9 @@ def cineplex_poller():
                                         last_row = rows[len(rows) - 1]['RowLabel']
                             except Exception as e:
                                 print(e)
-                        showing, new = Showing.objects.get_or_create(
-                            payment_url=session['ticketingUrl']
-                        )
-                        if new:
+                        showing = Showing.objects.all().filter(payment_url=session['ticketingUrl']).first()
+                        if showing is None:
+                            showing = Showing(payment_url=['ticketingUrl'])
                             showing.movie = movie
                             showing.date = showtime_date_and_time.date()
                             showing.time = showtime_date_and_time.time()
