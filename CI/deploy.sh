@@ -22,6 +22,7 @@ docker image rm -f $(docker images  | grep -i "${prod_poller_image_name_lower_ca
 if [ "${JENKINS}" == "true" ]; then
   export SECRET_KEY="${CINEPLEX_SECRET_KEY}";
   export HTTP_HOST="cineplex.modernneo.com";
+  export DOCKERIZED_DB="true";
   docker-compose -f "${docker_compose_file}" up -d
 else
   docker compose -f "${docker_compose_file}" up -d
