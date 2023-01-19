@@ -6,8 +6,9 @@ from django.views.generic.base import View
 
 from cineplex.models import DateToQuery, Showing
 
+
 # Create your views here.
-from cineplex_poller.cineplex_poller import cineplex_poller
+from cineplex_poller_app.cineplex_poller import cineplex_poller
 
 
 class Index(View):

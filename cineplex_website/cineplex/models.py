@@ -53,53 +53,43 @@ class Showing(models.Model):
         return self.date.strftime(date_format)
 
     def save(self, *args, **kwargs):
-        date = datetime.datetime.now().strftime(date_str_strftime_format)
+        current_date = datetime.datetime.now()
+        date = current_date.strftime(date_str_strftime_format)
         audit_log = None
         if self.id is None:
-            print(f"{date}-new showing being saved")
-            audit_log = f"{date}-showing added\n"
+            print(f"new showing being saved")
+            audit_log = f"showing added\n"
         if getattr(self, "_seatsRemaining", self.seatsRemaining) != self.seatsRemaining:
-            audit_log = (
-                f"{date}-changing seats remaining from {self.seatsRemaining} to {self._seatsRemaining}\n"
-            )
+            audit_log = (f"changing seats remaining from {self.seatsRemaining} to {self._seatsRemaining}\n")
             self.seatsRemaining = self._seatsRemaining
             print(f"{self.id}-existing showing being updated")
         if getattr(self, "_cc_enabled", self.cc_enabled) != self.cc_enabled:
-            audit_log = (
-                f"{date}-changing seats remaining from {self.cc_enabled} to {self._cc_enabled}\n"
-            )
+            audit_log = (f"changing seats remaining from {self.cc_enabled} to {self._cc_enabled}\n")
             self.cc_enabled = self._cc_enabled
             print(f"{self.id}-existing showing being updated")
 
         if getattr(self, "_ds_enabled", self.ds_enabled) != self.ds_enabled:
-            audit_log = (
-                f"{date}-changing seats remaining from {self.ds_enabled} to {self._ds_enabled}\n"
-            )
+            audit_log = (f"changing seats remaining from {self.ds_enabled} to {self._ds_enabled}\n")
             self.ds_enabled = self._ds_enabled
             print(f"{self.id}-existing showing being updated")
         if getattr(self, "_visible", self.visible) != self.visible:
-            audit_log = (
-                f"{date}-changing seats remaining from {self.visible} to {self._visible}\n"
-            )
+            audit_log = (f"changing seats remaining from {self.visible} to {self._visible}\n")
             self.visible = self._visible
             print(f"{self.id}-existing showing being updated")
         if getattr(self, "_last_row", self.last_row) != self.last_row:
-            audit_log = (
-                f"{date}-changing last row from {self.last_row} to {self._last_row}\n"
-            )
-            
+            audit_log = (f"changing last row from {self.last_row} to {self._last_row}\n")
             self.last_row = self._last_row
             print(f"{self.id}-existing showing being updated")
         super(Showing, self).save(*args, **kwargs)
         if audit_log is not None:
-            AuditLog(time_audited=date, audit_log=audit_log, showing=self).save()
+            AuditLog(time_audited=current_date, audit_log=audit_log, showing=self).save()
 
     @property
     def get_latest_update_date(self):
         return self.auditlog_set.all().order_by('-time_audited')[0].time_audited
 
     @property
-    def get_latest_update(self):
+    def get_latest_updates(self):
         return self.auditlog_set.all().order_by('-time_audited')
 
     def __str__(self):
@@ -110,3 +100,6 @@ class AuditLog(models.Model):
     time_audited = models.DateTimeField()
     audit_log = models.TextField()
     showing = models.ForeignKey(Showing, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.time_audited} {self.audit_log}"
