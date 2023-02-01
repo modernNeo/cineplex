@@ -21,6 +21,7 @@ from cineplex.models import DateToQuery, Movie, Showing, AuditLog
 
 def cineplex_poller():
     date = datetime.datetime.now().strftime("%Y/%m/%d - %-H:%M:%S")
+    print("polling at {date}")
     location_id = 1412
     headers = {
         "Ocp-Apim-Subscription-Key": os.environ['CINEPLEX_SUBSCRIPTION_KEY']
