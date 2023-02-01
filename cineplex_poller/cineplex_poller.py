@@ -162,7 +162,10 @@ def send_sms():
 
 
 if __name__ == '__main__':
+    print(1)
     scheduler = BlockingScheduler()
+    print(2)
     cineplex_poller()
+    print(3)
     scheduler.add_job(func=cineplex_poller, hour=17, trigger='cron')
     scheduler.start()
