@@ -10,6 +10,8 @@ COPY cineplex_poller/cineplex_poller.py cineplex_poller.py
 COPY CI/wait-for-postgres.sh wait-for-postgres.sh
 COPY cineplex_poller/startup.sh startup.sh
 
+RUN apk add postgresql
+
 CMD ["./wait-for-postgres.sh", "./startup.sh"]
 
 #CMD ["sh"]

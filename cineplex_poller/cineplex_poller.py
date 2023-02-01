@@ -72,7 +72,7 @@ def cineplex_poller():
                                 print(e)
                         showing = Showing.objects.all().filter(payment_url=session['ticketingUrl']).first()
                         if showing is None:
-                            showing = Showing(payment_url=['ticketingUrl'])
+                            showing = Showing(payment_url=session['ticketingUrl'])
                             showing.movie = movie
                             showing.date = showtime_date_and_time.date()
                             showing.time = showtime_date_and_time.time()

@@ -38,6 +38,8 @@ services:
         - POSTGRES_PASSWORD
         - COMPOSE_PROJECT_NAME
         - CINEPLEX_SUBSCRIPTION_KEY
+        - DOCKERIZED_DB
+        - SECRET_KEY
     depends_on:   # used to ensure that docker wont start finance_site until after it has started the database container
         - "db"
 #    stdin_open: true # docker run -i
