@@ -1,4 +1,7 @@
-#!/bin/ash
+#!/bin/sh
+
+# aquired from https://docs.docker.com/compose/startup-order/
+set -e -o xtrace
 
 apk update && apk add gcc
 
