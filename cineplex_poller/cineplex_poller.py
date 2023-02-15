@@ -103,9 +103,16 @@ def cineplex_poller():
                             showing.save()
                         else:
                             if current_time <= showtime_date_and_time:
-                                if not existing_shows[showing.id].visible:
-                                    showing._visible = True
-                                del existing_shows[showing.id]
+                                if showing.id in existing_shows:
+                                    if not existing_shows[showing.id].visible:
+                                        showing._visible = True
+                                    del existing_shows[showing.id]
+                                else:
+                                    showing.visible = True
+                                    print(
+                                        f"showing with id {showing.id} "
+                                        f"could not be found in the dict of existing showings"
+                                    )
                                 showing._seatsRemaining = session['seatsRemaining']
                                 showing._cc_enabled = showing_types['isCcEnabled']
                                 showing._ds_enabled = showing_types['isDsEnabled']
