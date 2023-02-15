@@ -15,7 +15,13 @@ pipeline {
                 string(credentialsId: 'CINEPLEX_POSTGRES_USER', variable: 'CINEPLEX_POSTGRES_USER'),
                 string(credentialsId: 'CINEPLEX_POSTGRES_DB', variable: 'CINEPLEX_POSTGRES_DB'),
                 string(credentialsId: 'CINEPLEX_SECRET_KEY', variable: 'CINEPLEX_SECRET_KEY'),
-                string(credentialsId: 'CINEPLEX_SUBSCRIPTION_KEY', variable: 'CINEPLEX_SUBSCRIPTION_KEY')]
+                string(credentialsId: 'CINEPLEX_SUBSCRIPTION_KEY', variable: 'CINEPLEX_SUBSCRIPTION_KEY'),
+                string(credentialsId: 'BESTBUY_STEELBOOKS_PASSWORD', variable: 'BESTBUY_STEELBOOKS_PASSWORD'),
+                string(credentialsId: 'TO_EMAIL', variable: 'TO_EMAIL'),
+                string(credentialsId: 'TWILIO_ACCOUNT_SID', variable: 'TWILIO_ACCOUNT_SID'),
+                string(credentialsId: 'TWILIO_AUTH_TOKEN', variable: 'TWILIO_AUTH_TOKEN'),
+                string(credentialsId: 'TO_NUMBER', variable: 'TO_NUMBER'),
+                string(credentialsId: 'TWILIO_VIRTUAL_NUMBER', variable: 'TWILIO_VIRTUAL_NUMBER')]
                 ){
                     sh label: '', script: """bash -c \'
                         export POSTGRES_DB="'"${CINEPLEX_POSTGRES_DB}"'";
@@ -23,6 +29,12 @@ pipeline {
                         export POSTGRES_PASSWORD="'"${CINEPLEX_POSTGRES_PASSWORD}"'";
                         export CINEPLEX_SECRET_KEY="'"${CINEPLEX_SECRET_KEY}"'";
                         export CINEPLEX_SUBSCRIPTION_KEY="'"${CINEPLEX_SUBSCRIPTION_KEY}"'";
+                        export BESTBUY_STEELBOOKS_PASSWORD="'"${BESTBUY_STEELBOOKS_PASSWORD}"'";
+                        export TO_EMAIL="'"${TO_EMAIL}"'";
+                        export TWILIO_ACCOUNT_SID="'"${TWILIO_ACCOUNT_SID}"'";
+                        export TWILIO_AUTH_TOKEN="'"${TWILIO_AUTH_TOKEN}"'";
+                        export TO_NUMBER="'"${TO_NUMBER}"'";
+                        export TWILIO_VIRTUAL_NUMBER="'"${TWILIO_VIRTUAL_NUMBER}"'";
                         export JENKINS="true";
                         ./CI/deploy.sh;
                     \'"""

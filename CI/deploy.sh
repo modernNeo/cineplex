@@ -19,12 +19,13 @@ docker rm -f ${prod_poller_container_name} || true
 docker image rm -f $(docker images  | grep -i "${prod_website_image_name_lower_case}" | awk '{print $3}') || true
 docker image rm -f $(docker images  | grep -i "${prod_poller_image_name_lower_case}" | awk '{print $3}') || true
 
+export DOCKERIZED_DB="true";
 if [ "${JENKINS}" == "true" ]; then
   export SECRET_KEY="${CINEPLEX_SECRET_KEY}";
   export HTTP_HOST="cineplex.modernneo.com";
-  export DOCKERIZED_DB="true";
   docker-compose -f "${docker_compose_file}" up -d
 else
+  docker network create cineplex_network || true
   docker compose -f "${docker_compose_file}" up -d
 fi
 

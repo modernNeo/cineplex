@@ -14,6 +14,12 @@ services:
         - CINEPLEX_SUBSCRIPTION_KEY
         - WEBSITE_DATABASE_PATH
         - DOCKERIZED_DB
+        - BESTBUY_STEELBOOKS_PASSWORD
+        - TO_EMAIL
+        - TWILIO_ACCOUNT_SID
+        - TWILIO_AUTH_TOKEN
+        - TO_NUMBER
+        - TWILIO_VIRTUAL_NUMBER
     depends_on:   # used to ensure that docker wont start finance_site until after it has started the database container
         - "db"
     container_name: "${COMPOSE_PROJECT_NAME}_website"
@@ -40,6 +46,12 @@ services:
         - CINEPLEX_SUBSCRIPTION_KEY
         - DOCKERIZED_DB
         - SECRET_KEY
+        - BESTBUY_STEELBOOKS_PASSWORD
+        - TO_EMAIL
+        - TWILIO_ACCOUNT_SID
+        - TWILIO_AUTH_TOKEN
+        - TO_NUMBER
+        - TWILIO_VIRTUAL_NUMBER
     depends_on:   # used to ensure that docker wont start finance_site until after it has started the database container
         - "db"
 #    stdin_open: true # docker run -i

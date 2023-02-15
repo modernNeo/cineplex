@@ -4,6 +4,8 @@ import os
 import re
 import smtplib
 from email.mime.multipart import MIMEMultipart
+from time import sleep
+
 from apscheduler.schedulers.blocking import BlockingScheduler
 from email.mime.text import MIMEText
 from urllib.request import urlopen
@@ -25,11 +27,24 @@ def cineplex_poller():
     headers = {
         "Ocp-Apim-Subscription-Key": os.environ['CINEPLEX_SUBSCRIPTION_KEY']
     }
-    # Showing.objects.all().delete()
-    existing_shows = {
-        showing.id: showing
-        for showing in Showing.objects.all().filter(date__gte=datetime.datetime.now())
-    }
+    existing_shows = {}
+    max_retries = 5
+    current_retries = 0
+    db_is_ready = False
+    while current_retries < max_retries and not db_is_ready:
+        try:
+            print(f"attempt {current_retries}/{max_retries}")
+            current_retries += 1
+            existing_shows = {
+                showing.id: showing
+                for showing in Showing.objects.all().filter(date__gte=datetime.datetime.now())
+            }
+            db_is_ready = True
+        except Exception as e:
+            sleep(5)
+            print(f"got error {e}")
+    if not db_is_ready:
+        raise Exception("shutting down cause the db won't get ready")
     print(f"{date}-starting poll")
     new_shows_with_cc = []
     current_time = datetime.datetime.now()
@@ -155,10 +170,10 @@ def send_sms():
     # change the "from_" number to your Twilio number and the "to" number
     # to the phone number you signed up for Twilio with, or upgrade your
     # account to send SMS to any phone number
-    client.messages.create(to=f"{os.environ['PHONE_NUMBER']}",
+    client.messages.create(to=f"{os.environ['TO_NUMBER']}",
                            from_=f"{os.environ['TWILIO_VIRTUAL_NUMBER']}",
                            body=body)
-    print(f"text sent to {os.environ['PHONE_NUMBER']} for new CC movies")
+    print(f"text sent to {os.environ['TO_NUMBER']} for new CC movies")
 
 
 if __name__ == '__main__':
