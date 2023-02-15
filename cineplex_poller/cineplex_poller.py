@@ -189,5 +189,5 @@ if __name__ == '__main__':
     print(2)
     cineplex_poller()
     print(3)
-    scheduler.add_job(func=cineplex_poller, hour=17, trigger='cron')
+    scheduler.add_job(func=cineplex_poller, hours=1, trigger='interval')
     scheduler.start()
