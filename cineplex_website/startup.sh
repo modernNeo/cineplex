@@ -16,4 +16,4 @@ pip install --no-cache-dir -r cineplex_poller_app/requirements.txt
 echo $DOCKERIZED_DB
 
 python manage.py migrate
-python manage.py runserver 0.0.0.0:8000
+python -u manage.py runserver 0.0.0.0:8000
