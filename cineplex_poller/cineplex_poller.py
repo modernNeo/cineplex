@@ -37,8 +37,13 @@ def cineplex_poller():
             current_retries += 1
             existing_shows = {
                 showing.id: showing
-                for showing in Showing.objects.all().filter(date__gte=datetime.datetime.now())
+                for showing in Showing.objects.all().filter(date__gt=datetime.datetime.now())
             }
+            existing_shows.update({
+                showing.id: showing
+                for showing in
+                Showing.objects.all().filter(date=datetime.datetime.now()).filter(time__gte=datetime.datetime.now())
+            })
             db_is_ready = True
         except Exception as e:
             sleep(5)
