@@ -130,7 +130,7 @@ class Showing(models.Model):
             audit_log = f"changing last row from {self.last_row} to {self._last_row}\n"
             self.last_row = self._last_row
             print(f"{self.id}-existing showing being updated")
-        if getattr(self, "_time", self.time) != self.last_row:
+        if getattr(self, "_time", self.time) != self.time:
             audit_log = f"changing time from {self.time} to {self._time}\n"
             self.time = self._time
             print(f"{self.id}-existing showing being updated")
