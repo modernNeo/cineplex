@@ -63,7 +63,7 @@ def cineplex_poller():
                     "GET",
                     (
                         f"https://apis.cineplex.com/prod/cpx/theatrical/api/v1/showtimes?language=en&"
-                        f"locationId={location_id}&date={date_to_query.get_date}&filmId={film_id}"
+                        f"locationId={location_id}&date={date_to_query.get_front_end_date}&filmId={film_id}"
                     ),
                     headers=headers, data={}
                 )
@@ -121,6 +121,7 @@ def cineplex_poller():
                                 showing._seatsRemaining = session['seatsRemaining']
                                 showing._cc_enabled = showing_types['isCcEnabled']
                                 showing._ds_enabled = showing_types['isDsEnabled']
+                                showing._time = showtime_date_and_time.time()
                                 showing._last_row = last_row
                                 if (
                                     (showing_types['isCcEnabled'] and showing_types[

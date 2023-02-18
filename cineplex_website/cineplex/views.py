@@ -4,8 +4,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic.base import View
 
-from cineplex.models import DateToQuery, Showing
-
+from cineplex.models import DateToQuery, Showing, Movie
 
 # Create your views here.
 from cineplex_poller_app.cineplex_poller import cineplex_poller
@@ -22,6 +21,7 @@ class Index(View):
             context={
                 "message": request.GET.get("message", None),
                 'current_date': datetime.datetime.now().strftime("%Y/%m/%d"),
+                "movies": Movie.get_all_showings(),
                 'dates': DateToQuery.objects.all()
             }
         )

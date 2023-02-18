@@ -9,11 +9,11 @@ class DateToQuery(models.Model):
     date = models.DateField()
 
     @property
-    def get_date(self):
+    def get_front_end_date(self):
         return self.date.strftime('%Y/%m/%d')
 
     def __str__(self):
-        return f"{self.get_date}"
+        return f"{self.get_front_end_date}"
 
 
 class Movie(models.Model):
@@ -22,6 +22,51 @@ class Movie(models.Model):
 
     def __str__(self):
         return f"{self.name}"
+
+    @classmethod
+    def get_all_showings(cls):
+        showings = {}
+        dates_to_query = DateToQuery.objects.all()
+        for date_to_query in dates_to_query:
+            movies_and_dates = date_to_query.movieanddateintersection_set.all()
+            for movies_and_date in movies_and_dates:
+                front_end_date = movies_and_date.date.get_front_end_date
+                date_obj = movies_and_date.date.date
+                movie = movies_and_date.movie
+                showings[front_end_date] = {
+                    movie.name: {
+                        'UltraAVX 3D D-BOX': movie.showing_set.all().filter(date=date_obj,
+                                                                            showing_type='UltraAVX 3D D-BOX'),
+                        'UltraAVX 3D': movie.showing_set.all().filter(date=date_obj, showing_type='UltraAVX 3D'),
+                        'UltraAVX D-BOX': movie.showing_set.all().filter(date=date_obj,
+                                                                         showing_type='UltraAVX D-BOX'),
+                        'UltraAVX': movie.showing_set.all().filter(date=date_obj, showing_type='UltraAVX'),
+                        'VIP 19+ 3D CC': movie.showing_set.all().filter(date=date_obj, showing_type='VIP 19+ 3D',
+                                                                        cc_enabled=True),
+                        'VIP 19+ 3D': movie.showing_set.all().filter(date=date_obj, showing_type='VIP 19+ 3D',
+                                                                     cc_enabled=False),
+                        'VIP 19+ CC': movie.showing_set.all().filter(date=date_obj, showing_type='VIP 19+',
+                                                                     cc_enabled=True),
+                        'VIP 19+': movie.showing_set.all().filter(date=date_obj, showing_type='VIP 19+',
+                                                                  cc_enabled=False),
+                        '3D CC': movie.showing_set.all().filter(date=date_obj, showing_type='3D',
+                                                                cc_enabled=True),
+                        '3D': movie.showing_set.all().filter(date=date_obj, showing_type='3D', cc_enabled=False),
+                        'Regular': movie.showing_set.all().filter(date=date_obj, showing_type='Regular')
+                    }
+                }
+                total_showings_on_date = movie.showing_set.all().filter(date=date_obj) \
+                    .exclude(showing_type='UltraAVX 3D D-BOX') \
+                    .exclude(showing_type='UltraAVX 3D') \
+                    .exclude(showing_type='UltraAVX D-BOX') \
+                    .exclude(showing_type='UltraAVX') \
+                    .exclude(showing_type='VIP 19+ 3D') \
+                    .exclude(showing_type='VIP 19+') \
+                    .exclude(showing_type='3D') \
+                    .exclude(showing_type='Regular')
+                if len(total_showings_on_date) > 0:
+                    raise Exception("more than 0 unaccounted for showings")
+        return showings
 
 
 class MovieAndDateIntersection(models.Model):
@@ -60,25 +105,28 @@ class Showing(models.Model):
             print(f"new showing being saved")
             audit_log = f"showing added\n"
         if getattr(self, "_seatsRemaining", self.seatsRemaining) != self.seatsRemaining:
-            audit_log = (f"changing seats remaining from {self.seatsRemaining} to {self._seatsRemaining}\n")
+            audit_log = f"changing seats remaining from {self.seatsRemaining} to {self._seatsRemaining}\n"
             self.seatsRemaining = self._seatsRemaining
             print(f"{self.id}-existing showing being updated")
         if getattr(self, "_cc_enabled", self.cc_enabled) != self.cc_enabled:
-            audit_log = (f"changing seats remaining from {self.cc_enabled} to {self._cc_enabled}\n")
+            audit_log = f"changing seats remaining from {self.cc_enabled} to {self._cc_enabled}\n"
             self.cc_enabled = self._cc_enabled
             print(f"{self.id}-existing showing being updated")
-
         if getattr(self, "_ds_enabled", self.ds_enabled) != self.ds_enabled:
-            audit_log = (f"changing seats remaining from {self.ds_enabled} to {self._ds_enabled}\n")
+            audit_log = f"changing seats remaining from {self.ds_enabled} to {self._ds_enabled}\n"
             self.ds_enabled = self._ds_enabled
             print(f"{self.id}-existing showing being updated")
         if getattr(self, "_visible", self.visible) != self.visible:
-            audit_log = (f"changing seats remaining from {self.visible} to {self._visible}\n")
+            audit_log = f"changing visibility from {self.visible} to {self._visible}\n"
             self.visible = self._visible
             print(f"{self.id}-existing showing being updated")
         if getattr(self, "_last_row", self.last_row) != self.last_row:
-            audit_log = (f"changing last row from {self.last_row} to {self._last_row}\n")
+            audit_log = f"changing last row from {self.last_row} to {self._last_row}\n"
             self.last_row = self._last_row
+            print(f"{self.id}-existing showing being updated")
+        if getattr(self, "_time", self.time) != self.last_row:
+            audit_log = f"changing time from {self.time} to {self._time}\n"
+            self.time = self._time
             print(f"{self.id}-existing showing being updated")
         super(Showing, self).save(*args, **kwargs)
         if audit_log is not None:
@@ -91,6 +139,10 @@ class Showing(models.Model):
     @property
     def get_latest_updates(self):
         return self.auditlog_set.all().order_by('-time_audited')
+
+    @property
+    def get_front_end_string(self):
+        return f"Time: {self.date} {self.time.strftime('%I:%M %p')} {self.auditorium} | Last Row: {self.last_row}"
 
     def __str__(self):
         return f"Movie: {self.movie} - Time: {self.date} {self.time.strftime('%I:%M %p')} - CC: {self.cc_enabled} - Showing Type:  {self.showing_type} | {self.auditorium} | Last Row: {self.last_row}"

@@ -10,31 +10,36 @@
         {% endif %}
         <div class="tabs" id="tabs">
             <ul>
-                {% for date in dates %}
-                    {% if date.get_date == current_date %}
-                        <li data-tab="{{date.get_date}}" class="is-active"><a>{{date.get_date}}</a></li>
+                {% for showing_date in dates %}
+                    {% if showing_date == current_date %}
+                        <li data-tab="{{showing_date}}" class="is-active"><a>{{showing_date}}</a></li>
                     {% else %}
-                        <li data-tab="{{date.get_date}}"><a>{{date.get_date}}</a></li>
+                        <li data-tab="{{showing_date}}"><a>{{showing_date}}</a></li>
                     {% endif %}
                 {% endfor %}
             </ul>
         </div>
         <div id="tab-content">
-            {% for date in dates %}
-                {% if date.get_date == current_date %}<div data-content="{{date.get_date}}">{% else %}<div class="is-hidden" data-content="{{date.get_date}}">{% endif %}
-                    {%  for movie in date.movieanddateintersection_set.all %}
-                        <p>{{ movie.movie }}</p>
-                        {%  for showing in movie.movie.showing_set.all %}
-                            {% if showing.get_date == date.get_date %}
-                                {%  if showing.cc_enabled %}<b>{%  endif %}
-                                    {%  if not showing.visible %}<strike>{%  endif %}
-                                    <p><a href="{{ showing.payment_url }}">{{ showing }}</a></p>
-                                    {%  if not showing.visible %}</strike>{%  endif %}
-                                {%  if showing.cc_enabled %}</b>{%  endif %}
+            {% for date, movie_showing_info in movies.items %}
+                {%  for movie, showing_types in movie_showing_info.items %}
+                    {% if date == current_date %}<div data-content="{{date}}">{% else %}<div class="is-hidden" data-content="{{date}}">{% endif %}
+                        {{ movie }}
+                        {%  for category, showings in showing_types.items %}
+                            {%  if showings|length > 0 %}
+                                <p>{{ category}}</p>
+                                {%  for showing in showings %}
+                                    {% if showing.get_date == date %}
+                                        {%  if showing.cc_enabled %}<b>{%  endif %}
+                                        {%  if not showing.visible %}<strike>{%  endif %}
+                                        <p><a href="{{ showing.payment_url }}">{{ showing.get_front_end_string }}</a></p>
+                                        {%  if not showing.visible %}</strike>{%  endif %}
+                                        {%  if showing.cc_enabled %}</b>{%  endif %}
+                                    {%  endif %}
+                                {%  endfor %}
                             {%  endif %}
                         {%  endfor %}
-                    {%  endfor %}
-                </div>
+                    </div>
+                {%  endfor %}
             {%  endfor %}
         </div>
         <script>
