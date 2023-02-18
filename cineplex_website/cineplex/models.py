@@ -35,24 +35,30 @@ class Movie(models.Model):
                 movie = movies_and_date.movie
                 showings[front_end_date] = {
                     movie.name: {
-                        'UltraAVX 3D D-BOX': movie.showing_set.all().filter(date=date_obj,
-                                                                            showing_type='UltraAVX 3D D-BOX'),
-                        'UltraAVX 3D': movie.showing_set.all().filter(date=date_obj, showing_type='UltraAVX 3D'),
-                        'UltraAVX D-BOX': movie.showing_set.all().filter(date=date_obj,
-                                                                         showing_type='UltraAVX D-BOX'),
-                        'UltraAVX': movie.showing_set.all().filter(date=date_obj, showing_type='UltraAVX'),
-                        'VIP 19+ 3D CC': movie.showing_set.all().filter(date=date_obj, showing_type='VIP 19+ 3D',
-                                                                        cc_enabled=True),
-                        'VIP 19+ 3D': movie.showing_set.all().filter(date=date_obj, showing_type='VIP 19+ 3D',
-                                                                     cc_enabled=False),
-                        'VIP 19+ CC': movie.showing_set.all().filter(date=date_obj, showing_type='VIP 19+',
-                                                                     cc_enabled=True),
-                        'VIP 19+': movie.showing_set.all().filter(date=date_obj, showing_type='VIP 19+',
-                                                                  cc_enabled=False),
-                        '3D CC': movie.showing_set.all().filter(date=date_obj, showing_type='3D',
-                                                                cc_enabled=True),
-                        '3D': movie.showing_set.all().filter(date=date_obj, showing_type='3D', cc_enabled=False),
-                        'Regular': movie.showing_set.all().filter(date=date_obj, showing_type='Regular')
+                        'UltraAVX 3D D-BOX': movie.showing_set.all()
+                        .filter(
+                            date=date_obj, showing_type='UltraAVX 3D D-BOX'
+                        ).order_by('time'),
+                        'UltraAVX 3D': movie.showing_set.all()
+                        .filter(date=date_obj, showing_type='UltraAVX 3D').order_by('time'),
+                        'UltraAVX D-BOX': movie.showing_set.all()
+                        .filter(date=date_obj, showing_type='UltraAVX D-BOX').order_by('time'),
+                        'UltraAVX': movie.showing_set.all()
+                        .filter(date=date_obj, showing_type='UltraAVX').order_by('time'),
+                        'VIP 19+ 3D CC': movie.showing_set.all()
+                        .filter(date=date_obj, showing_type='VIP 19+ 3D',cc_enabled=True).order_by('time'),
+                        'VIP 19+ 3D': movie.showing_set.all()
+                        .filter(date=date_obj, showing_type='VIP 19+ 3D',cc_enabled=False).order_by('time'),
+                        'VIP 19+ CC': movie.showing_set.all()
+                        .filter(date=date_obj, showing_type='VIP 19+',cc_enabled=True).order_by('time'),
+                        'VIP 19+': movie.showing_set.all()
+                        .filter(date=date_obj, showing_type='VIP 19+',cc_enabled=False).order_by('time'),
+                        '3D CC': movie.showing_set.all()
+                        .filter(date=date_obj, showing_type='3D',cc_enabled=True).order_by('time'),
+                        '3D': movie.showing_set.all()
+                        .filter(date=date_obj, showing_type='3D', cc_enabled=False).order_by('time'),
+                        'Regular': movie.showing_set.all()
+                        .filter(date=date_obj, showing_type='Regular').order_by('time')
                     }
                 }
                 total_showings_on_date = movie.showing_set.all().filter(date=date_obj) \
