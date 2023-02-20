@@ -23,6 +23,16 @@ class Movie(models.Model):
     def __str__(self):
         return f"{self.name}"
 
+    def save(self, *args, **kwargs):
+        current_date = datetime.datetime.now()
+        audit_log = None
+        if self.id is None:
+            audit_log = f"page for movie {self.name} now exists"
+            print(audit_log)
+        super(Movie, self).save(*args, **kwargs)
+        if audit_log is not None:
+            AuditLog(time_audited=current_date, audit_log=audit_log, showing=self).save()
+
     @classmethod
     def get_all_showings(cls):
         showings = {}
@@ -46,15 +56,15 @@ class Movie(models.Model):
                         'UltraAVX': movie.showing_set.all()
                         .filter(date=date_obj, showing_type='UltraAVX').order_by('time'),
                         'VIP 19+ 3D CC': movie.showing_set.all()
-                        .filter(date=date_obj, showing_type='VIP 19+ 3D',cc_enabled=True).order_by('time'),
+                        .filter(date=date_obj, showing_type='VIP 19+ 3D', cc_enabled=True).order_by('time'),
                         'VIP 19+ 3D': movie.showing_set.all()
-                        .filter(date=date_obj, showing_type='VIP 19+ 3D',cc_enabled=False).order_by('time'),
+                        .filter(date=date_obj, showing_type='VIP 19+ 3D', cc_enabled=False).order_by('time'),
                         'VIP 19+ CC': movie.showing_set.all()
-                        .filter(date=date_obj, showing_type='VIP 19+',cc_enabled=True).order_by('time'),
+                        .filter(date=date_obj, showing_type='VIP 19+', cc_enabled=True).order_by('time'),
                         'VIP 19+': movie.showing_set.all()
-                        .filter(date=date_obj, showing_type='VIP 19+',cc_enabled=False).order_by('time'),
+                        .filter(date=date_obj, showing_type='VIP 19+', cc_enabled=False).order_by('time'),
                         '3D CC': movie.showing_set.all()
-                        .filter(date=date_obj, showing_type='3D',cc_enabled=True).order_by('time'),
+                        .filter(date=date_obj, showing_type='3D', cc_enabled=True).order_by('time'),
                         '3D': movie.showing_set.all()
                         .filter(date=date_obj, showing_type='3D', cc_enabled=False).order_by('time'),
                         'Regular': movie.showing_set.all()
@@ -73,6 +83,15 @@ class Movie(models.Model):
                 if len(total_showings_on_date) > 0:
                     raise Exception("more than 0 unaccounted for showings")
         return showings
+
+
+class MovieAuditLog(models.Model):
+    time_audited = models.DateTimeField()
+    audit_log = models.TextField()
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.time_audited} {self.audit_log}"
 
 
 class MovieAndDateIntersection(models.Model):
@@ -105,7 +124,6 @@ class Showing(models.Model):
 
     def save(self, *args, **kwargs):
         current_date = datetime.datetime.now()
-        date = current_date.strftime(date_str_strftime_format)
         audit_log = None
         if self.id is None:
             print(f"new showing being saved")

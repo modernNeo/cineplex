@@ -4,24 +4,40 @@ import os
 import re
 import smtplib
 from email.mime.multipart import MIMEMultipart
-from time import sleep
-
-from apscheduler.schedulers.blocking import BlockingScheduler
 from email.mime.text import MIMEText
+from time import sleep
 from urllib.request import urlopen
 
 import django
 import requests
+from apscheduler.schedulers.blocking import BlockingScheduler
 from bs4 import BeautifulSoup
 from twilio.rest import Client
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
 django.setup()
 
-from cineplex.models import DateToQuery, Movie, Showing, AuditLog
+from cineplex.models import DateToQuery, Movie, Showing
 
 
-def cineplex_poller():
+def poll_which_cineplex_movies_are_available():
+    headers = {
+        "Ocp-Apim-Subscription-Key": os.environ['CINEPLEX_SUBSCRIPTION_KEY']
+    }
+    response = requests.request(
+        "GET", f"https://apis.cineplex.com/prod/cpx/theatrical/api/v1/movies/bookable?language=en", headers=headers,
+        data={}
+    )
+    response = (json.loads(response.text))
+    movies = Movie.objects.all()
+    for movie in response:
+        if movies.filter(filmId=movie['id']) is None:
+            if "shazam" in movie['name'].lower():
+                send_email("Shazam movie tickets are out")
+            Movie(filmId=movie['id'], name=movie['name']).save()
+
+
+def poll_cineplex_showings():
     date = datetime.datetime.now().strftime("%Y/%m/%d - %-H:%M:%S")
     location_id = 1412
     headers = {
@@ -190,10 +206,7 @@ def send_sms():
 
 
 if __name__ == '__main__':
-    print(1)
     scheduler = BlockingScheduler()
-    print(2)
-    cineplex_poller()
-    print(3)
-    scheduler.add_job(func=cineplex_poller, hours=1, trigger='interval')
+    scheduler.add_job(func=poll_which_cineplex_movies_are_available, hour=17, trigger='cron')
+    scheduler.add_job(func=poll_cineplex_showings, hours=1, trigger='interval')
     scheduler.start()

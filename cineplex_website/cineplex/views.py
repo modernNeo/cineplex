@@ -7,14 +7,14 @@ from django.views.generic.base import View
 from cineplex.models import DateToQuery, Showing, Movie
 
 # Create your views here.
-from cineplex_poller_app.cineplex_poller import cineplex_poller
+from cineplex_poller_app.cineplex_poller import poll_cineplex_showings
 
 
 class Index(View):
 
     def get(self, request):
         if request.GET.get('poll_site', None) is not None and request.GET['poll_site']:
-            cineplex_poller()
+            poll_cineplex_showings()
             return HttpResponseRedirect("/?message=polling%20done")
         return render(
             request, 'index.html',
@@ -31,7 +31,7 @@ class AuditLogs(View):
 
     def get(self, request):
         if request.GET.get('poll_site', None) is not None and request.GET['poll_site']:
-            cineplex_poller()
+            poll_cineplex_showings()
             return HttpResponseRedirect("/audit_logs?message=polling%20done")
         return render(
             request,
