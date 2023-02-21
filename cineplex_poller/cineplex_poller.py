@@ -24,17 +24,22 @@ def poll_which_cineplex_movies_are_available():
     headers = {
         "Ocp-Apim-Subscription-Key": os.environ['CINEPLEX_SUBSCRIPTION_KEY']
     }
+    date = datetime.datetime.now().strftime("%Y/%m/%d - %-H:%M:%S")
+    print(f"{date}-will start polling which movies are available")
     response = requests.request(
         "GET", f"https://apis.cineplex.com/prod/cpx/theatrical/api/v1/movies/bookable?language=en", headers=headers,
         data={}
     )
+    print("got the list of movies that are available")
     response = (json.loads(response.text))
     movies = Movie.objects.all()
     for movie in response:
+        print(f"parsing movie {movie}")
         if movies.filter(filmId=movie['id']) is None:
             if "shazam" in movie['name'].lower():
                 send_email("Shazam movie tickets are out")
             Movie(filmId=movie['id'], name=movie['name']).save()
+    print(f"{date}-finished updating the list of movies that are available")
 
 
 def poll_cineplex_showings():
