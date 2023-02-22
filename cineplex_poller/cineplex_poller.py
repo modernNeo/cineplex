@@ -35,7 +35,7 @@ def poll_which_cineplex_movies_are_available():
     movies = Movie.objects.all()
     for movie in response:
         print(f"parsing movie {movie}")
-        if movies.filter(filmId=movie['id']) is None:
+        if movies.filter(filmId=movie['id']).first() is None:
             if "shazam" in movie['name'].lower():
                 send_email("Shazam movie tickets are out")
             Movie(filmId=movie['id'], name=movie['name']).save()
