@@ -31,7 +31,7 @@ class Movie(models.Model):
             print(audit_log)
         super(Movie, self).save(*args, **kwargs)
         if audit_log is not None:
-            MovieAuditLog(time_audited=current_date, audit_log=audit_log, showing=self).save()
+            MovieAuditLog(time_audited=current_date, audit_log=audit_log, movie=self).save()
 
     @classmethod
     def get_all_showings(cls):
