@@ -36,8 +36,8 @@ def poll_which_cineplex_movies_are_available():
     for movie in response:
         print(f"parsing movie {movie}")
         if movies.filter(filmId=movie['id']).first() is None:
-            if "shazam" in movie['name'].lower():
-                send_email("Shazam movie tickets are out")
+            if "the flash" in movie['name'].lower():
+                send_email("Flash movie tickets are out")
             Movie(filmId=movie['id'], name=movie['name']).save()
     print(f"{date}-finished updating the list of movies that are available")
 
